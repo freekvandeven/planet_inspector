@@ -1,9 +1,13 @@
+# SPDX-FileCopyrightText: 2023 Freek van de Ven freek@freekvandeven.nl
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 name: planet_inspector
 description: Flutter planet inspector UI challenge
 
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0
 
 environment:
   sdk: '>=2.18.5 <3.0.0'
@@ -12,6 +16,8 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
+  hooks_riverpod: ^2.1.3
+  flutter_hooks: ^0.18.5+1
 
 dev_dependencies:
   flutter_test:
