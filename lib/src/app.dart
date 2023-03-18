@@ -7,7 +7,7 @@ import 'package:planet_inspector/src/theme.dart';
 import 'package:planet_inspector/src/ui/home.dart';
 
 class PlanetInspectorApp extends StatelessWidget {
-  const PlanetInspectorApp({Key? key}) : super(key: key);
+  const PlanetInspectorApp({super.key});
 
   @override
   Widget build(BuildContext context) {

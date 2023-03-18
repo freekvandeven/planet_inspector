@@ -22,12 +22,13 @@ class LocalPlanetService extends PlanetService {
     state = [
       // earth
       const Planet(
-          name: 'Earth',
-          shortDescription: 'The third planet from the sun',
-          fullDescription: 'The third planet from the sun',
-          color: Colors.blue,
-          history: 'The third planet from the sun',
-          assetLocation: 'assets/earth.png'),
+        name: 'Earth',
+        shortDescription: 'The third planet from the sun',
+        fullDescription: 'The third planet from the sun',
+        color: Colors.blue,
+        history: 'The third planet from the sun',
+        assetLocation: 'assets/earth.png',
+      ),
 
       // moon
       const Planet(

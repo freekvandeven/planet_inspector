@@ -20,37 +20,37 @@ ThemeData getTheme() {
       onSurface: Colors.white,
     ),
     textTheme: const TextTheme(
-      headline1: TextStyle(
+      displayLarge: TextStyle(
         fontFamily: 'Apercu',
         fontSize: 22,
         fontWeight: FontWeight.w600,
         color: Colors.white,
       ),
-      headline3: TextStyle(
+      displaySmall: TextStyle(
         fontFamily: 'Apercu',
         fontSize: 20,
         fontWeight: FontWeight.w500,
         color: Colors.white,
       ),
-      headline4: TextStyle(
+      headlineMedium: TextStyle(
         fontFamily: 'Apercu',
         fontSize: 18,
         fontWeight: FontWeight.w500,
         color: Color.fromARGB(255, 117, 115, 115),
       ),
-      headline5: TextStyle(
+      headlineSmall: TextStyle(
         fontFamily: 'Apercu',
         fontSize: 16,
         fontWeight: FontWeight.w500,
         color: Colors.white,
       ),
-      headline6: TextStyle(
+      titleLarge: TextStyle(
         fontFamily: 'Apercu',
         fontSize: 16,
         fontWeight: FontWeight.w400,
         color: Colors.white,
       ),
-      bodyText1: TextStyle(
+      bodyLarge: TextStyle(
         fontFamily: 'Apercu',
         fontSize: 16,
         fontWeight: FontWeight.w500,

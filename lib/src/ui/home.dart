@@ -11,10 +11,15 @@ class PlanetOverviewScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var planets = ref.watch(planetsProvider);
-    useEffect(() {
-      ref.read(planetsProvider.notifier).fetchPlanets();
-      return null;
-    }, const []);
+    useEffect(
+      () {
+        Future.delayed(Duration.zero, () async {
+          await ref.read(planetsProvider.notifier).fetchPlanets();
+        });
+        return null;
+      },
+      const [],
+    );
     if (planets.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
