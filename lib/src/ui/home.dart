@@ -11,6 +11,7 @@ class PlanetOverviewScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var planets = ref.watch(planetsProvider);
+    var currentPlanet = useState(0);
     useEffect(
       () {
         Future.delayed(Duration.zero, () async {
@@ -39,17 +40,37 @@ class PlanetOverviewScreen extends HookConsumerWidget {
               // icon search
               Icon(Icons.search, color: Colors.black, size: 30.0),
 
-              Text('XORE'),
+              Text(
+                'XORE',
+                style: TextStyle(fontSize: 30.0, color: Colors.black),
+              ),
 
               // icon enlarge
               Icon(Icons.fullscreen_sharp, color: Colors.black, size: 30.0),
             ],
+          ),
+          // vertical text of the planet
+          SizedBox(
+            height: size.height * 0.05,
+          ),
+          RotatedBox(
+            quarterTurns: 1,
+            child: Text(
+              planets[currentPlanet.value].name,
+              style: const TextStyle(
+                fontSize: 100.0,
+                color: Colors.grey,
+                letterSpacing: 20,
+                fontWeight: FontWeight.w100,
+              ),
+            ),
           ),
           const Spacer(),
           PlanetSliderWidget(
             planets: planets,
             onPlanetChanged: (selectedPlanet) {
               debugPrint('selected planet: $selectedPlanet');
+              currentPlanet.value = selectedPlanet;
             },
             height: size.height * 0.2,
           ),
