@@ -49,6 +49,47 @@ class LocalPlanetService extends PlanetService {
         history: 'The fourth planet from the sun',
         assetLocation: 'assets/mars.png',
       ),
+
+      // add 4 more planets
+      // mars
+      const Planet(
+        name: 'Venus',
+        shortDescription: 'The fourth planet from the sun',
+        fullDescription: 'The fourth planet from the sun',
+        color: Colors.pink,
+        history: 'The fourth planet from the sun',
+        assetLocation: 'assets/mars.png',
+      ),
+
+      // mars
+      const Planet(
+        name: 'Venus2',
+        shortDescription: 'The fourth planet from the sun',
+        fullDescription: 'The fourth planet from the sun',
+        color: Colors.deepOrange,
+        history: 'The fourth planet from the sun',
+        assetLocation: 'assets/mars.png',
+      ),
+
+      // mars
+      const Planet(
+        name: 'Venus3',
+        shortDescription: 'The fourth planet from the sun',
+        fullDescription: 'The fourth planet from the sun',
+        color: Colors.deepOrange,
+        history: 'The fourth planet from the sun',
+        assetLocation: 'assets/mars.png',
+      ),
+
+      // mars
+      const Planet(
+        name: 'Venus4',
+        shortDescription: 'The fourth planet from the sun',
+        fullDescription: 'The fourth planet from the sun',
+        color: Colors.deepOrange,
+        history: 'The fourth planet from the sun',
+        assetLocation: 'assets/mars.png',
+      ),
     ];
   }
 }
