@@ -20,7 +20,7 @@ class PlanetSliderWidget extends HookWidget {
   final Function(int) onPlanetChanged;
   final int currentPlanet;
   final int targetPlanet;
-  final List<Planet> planets;
+  final List<PlanetModel> planets;
   final double opacity;
   // animation for the planets orbiting
   final AnimationController planetOrbitAnimationController;
@@ -157,8 +157,7 @@ class PlanetSliderWidget extends HookWidget {
   }
 
   bool planetsMovingFoward() {
-    return (!(targetPlanet == planets.length - 1 && currentPlanet == 0) &&
-            currentPlanet < targetPlanet) ||
-        (targetPlanet == 0 && currentPlanet == planets.length - 1);
+    return (currentPlanet < targetPlanet) ||
+        (currentPlanet == planets.length - 1 && targetPlanet == 0);
   }
 }

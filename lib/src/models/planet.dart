@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 @immutable
-class Planet {
-  const Planet({
+class PlanetModel {
+  const PlanetModel({
     required this.name,
     required this.shortDescription,
     required this.fullDescription,
@@ -18,7 +18,7 @@ class Planet {
   final String history;
   final String assetLocation;
 
-  Planet copyWith({
+  PlanetModel copyWith({
     String? name,
     String? shortDescription,
     String? fullDescription,
@@ -26,7 +26,7 @@ class Planet {
     String? history,
     String? assetLocation,
   }) {
-    return Planet(
+    return PlanetModel(
       name: name ?? this.name,
       shortDescription: shortDescription ?? this.shortDescription,
       fullDescription: fullDescription ?? this.fullDescription,

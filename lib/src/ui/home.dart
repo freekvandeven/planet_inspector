@@ -11,7 +11,7 @@ class PlanetOverviewScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var planets = ref.watch(planetsProvider);
+    var planets = ref.watch(planetsProvider).planets;
     var currentPlanet = useState(0);
     var targetPlanet = useState(0);
     var startupAnimationController = useAnimationController(
@@ -150,21 +150,31 @@ class PlanetOverviewScreen extends HookConsumerWidget {
           top: size.height * 0.6 - helmetAnimation * size.height * 0.3,
           child: Opacity(
             opacity: helmetAnimation,
-            child: Container(
-              width: size.width * 0.5,
-              height: size.width * 0.5,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                // shadow to the bottom
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black,
-                    blurRadius: 10.0,
-                    spreadRadius: 1.0,
-                    offset: Offset(0.0, 5.0),
-                  ),
-                ],
+            child: GestureDetector(
+              onTap: () async {
+                ref
+                    .read(planetsProvider.notifier)
+                    .selectPlanet(planets[currentPlanet.value]);
+                await Navigator.of(context).pushNamed(
+                  '/planet',
+                );
+              },
+              child: Container(
+                width: size.width * 0.5,
+                height: size.width * 0.5,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  // shadow to the bottom
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black,
+                      blurRadius: 10.0,
+                      spreadRadius: 1.0,
+                      offset: Offset(0.0, 5.0),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
