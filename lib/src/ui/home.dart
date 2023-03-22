@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:planet_inspector/src/services/planet.dart';
+import 'package:planet_inspector/src/ui/animated_vertical_text.dart';
 import 'package:planet_inspector/src/ui/planet_slider.dart';
 
 class PlanetOverviewScreen extends HookConsumerWidget {
@@ -19,7 +20,7 @@ class PlanetOverviewScreen extends HookConsumerWidget {
       upperBound: 1.0,
     );
     var slidingAnimationController = useAnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 2000),
       initialValue: 0.0,
       lowerBound: 0.0,
       upperBound: 1.0,
@@ -101,17 +102,10 @@ class PlanetOverviewScreen extends HookConsumerWidget {
                     SizedBox(
                       height: size.height * 0.05,
                     ),
-                    RotatedBox(
-                      quarterTurns: 1,
-                      child: Text(
-                        planets[currentPlanet.value].name,
-                        style: const TextStyle(
-                          fontSize: 100.0,
-                          color: Colors.grey,
-                          letterSpacing: 20,
-                          fontWeight: FontWeight.w100,
-                        ),
-                      ),
+                    AnimatedVerticalText(
+                      currentText: planets[currentPlanet.value].name,
+                      targetText: planets[targetPlanet.value].name,
+                      animationController: slidingAnimationController,
                     ),
                   ],
                 ),

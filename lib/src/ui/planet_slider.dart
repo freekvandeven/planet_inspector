@@ -32,7 +32,13 @@ class PlanetSliderWidget extends HookWidget {
     var planetSliderAnimation = useAnimation(
       CurvedAnimation(
         parent: planetOrbitAnimationController,
-        curve: Curves.easeIn,
+        curve: Curves.easeInOut,
+      ),
+    );
+    var planetTextFadeAnimation = useAnimation(
+      CurvedAnimation(
+        parent: planetOrbitAnimationController,
+        curve: Curves.easeInExpo,
       ),
     );
     return Opacity(
@@ -123,18 +129,23 @@ class PlanetSliderWidget extends HookWidget {
                 SizedBox(
                   height: height * 0.1,
                 ),
-                Text(
-                  planets[currentPlanet].name.toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 18.0,
-                    decoration: TextDecoration.underline,
-                    letterSpacing: 5,
-                    color: Colors.transparent,
-                    decorationColor: Colors.grey,
-                    shadows: [
-                      Shadow(color: Colors.black, offset: Offset(0, -8))
-                    ],
-                    decorationThickness: 2,
+                Opacity(
+                  opacity: (currentPlanet != targetPlanet)
+                      ? planetTextFadeAnimation
+                      : 1.0,
+                  child: Text(
+                    planets[targetPlanet].name.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 18.0,
+                      decoration: TextDecoration.underline,
+                      letterSpacing: 5,
+                      color: Colors.transparent,
+                      decorationColor: Colors.grey,
+                      shadows: [
+                        Shadow(color: Colors.black, offset: Offset(0, -8))
+                      ],
+                      decorationThickness: 2,
+                    ),
                   ),
                 ),
               ],
