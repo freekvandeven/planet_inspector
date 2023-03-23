@@ -30,7 +30,9 @@ class AllPlanets {
 abstract class PlanetService extends StateNotifier<AllPlanets> {
   PlanetService() : super(const AllPlanets(planets: []));
 
-  void selectPlanet(PlanetModel planet);
+  void selectPlanet(int index);
+
+  void selectNextPlanet() {}
 
   Future<void> fetchPlanets();
 }
@@ -39,8 +41,16 @@ class LocalPlanetService extends PlanetService {
   LocalPlanetService() : super();
 
   @override
-  void selectPlanet(PlanetModel planet) {
-    state = state.copyWith(selectedPlanetIndex: state.planets.indexOf(planet));
+  void selectPlanet(int index) {
+    state = state.copyWith(selectedPlanetIndex: index);
+  }
+
+  @override
+  void selectNextPlanet() {
+    state = state.copyWith(
+      selectedPlanetIndex:
+          (state.selectedPlanetIndex! + 1) % state.planets.length,
+    );
   }
 
   @override
@@ -75,7 +85,7 @@ class LocalPlanetService extends PlanetService {
           fullDescription: 'The fourth planet from the sun',
           color: Colors.deepOrange,
           history: 'The fourth planet from the sun',
-          assetLocation: 'assets/planets/mars/mars.obj',
+          assetLocation: 'assets/planets/earth/earth.obj',
         ),
 
         // add 4 more planets
@@ -86,7 +96,7 @@ class LocalPlanetService extends PlanetService {
           fullDescription: 'The fourth planet from the sun',
           color: Colors.pink,
           history: 'The fourth planet from the sun',
-          assetLocation: 'assets/planets/earth/earth.obj',
+          assetLocation: 'assets/planets/mars/mars.obj',
         ),
 
         // mars
@@ -116,7 +126,7 @@ class LocalPlanetService extends PlanetService {
           fullDescription: 'The fourth planet from the sun',
           color: Colors.deepOrange,
           history: 'The fourth planet from the sun',
-          assetLocation: 'assets/planets/mars/mars.obj',
+          assetLocation: 'assets/planets/earth/earth.obj',
         ),
       ],
     );

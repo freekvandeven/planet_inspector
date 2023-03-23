@@ -154,7 +154,7 @@ class PlanetOverviewScreen extends HookConsumerWidget {
               onTap: () async {
                 ref
                     .read(planetsProvider.notifier)
-                    .selectPlanet(planets[currentPlanet.value]);
+                    .selectPlanet(currentPlanet.value);
                 await Navigator.of(context).pushNamed(
                   '/planet',
                 );
@@ -185,12 +185,22 @@ class PlanetOverviewScreen extends HookConsumerWidget {
               helmetAnimation * size.height * 0.3,
           child: Opacity(
             opacity: helmetAnimation,
-            child: Container(
-              width: size.width * 0.4,
-              height: size.width * 0.4,
-              decoration: const BoxDecoration(
-                color: Colors.black,
-                shape: BoxShape.circle,
+            child: GestureDetector(
+              onTap: () async {
+                ref
+                    .read(planetsProvider.notifier)
+                    .selectPlanet(currentPlanet.value);
+                await Navigator.of(context).pushNamed(
+                  '/planet',
+                );
+              },
+              child: Container(
+                width: size.width * 0.4,
+                height: size.width * 0.4,
+                decoration: const BoxDecoration(
+                  color: Colors.black,
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
           ),
