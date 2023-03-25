@@ -65,11 +65,12 @@ packages:
   flutter_cube:
     dependency: "direct main"
     description:
-      name: flutter_cube
-      sha256: "71cf679a251166eb97f86751c56582b09abdbf859485fbf60524948813914c3b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.1"
+      path: "."
+      ref: HEAD
+      resolved-ref: "4df12db3406994b8a7b4001ecdf627f5781f9159"
+      url: "https://github.com/ueman/flutter_cube"
+    source: git
+    version: "0.1.0"
   flutter_hooks:
     dependency: "direct main"
     description:
@@ -157,7 +158,7 @@ packages:
     source: hosted
     version: "1.8.0"
   path:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path
       sha256: db9d4f58c908a4ba5953fcee2ae317c94889433e5024c27ce74a37f94267945b

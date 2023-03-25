@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cube/flutter_cube.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:planet_inspector/src/models/planet.dart';
+import 'package:planet_inspector/src/services/planet_caching.dart';
 
-class Planet extends HookWidget {
+class Planet extends HookConsumerWidget {
   const Planet({
     required this.planet,
     required this.interative,
@@ -18,7 +20,7 @@ class Planet extends HookWidget {
   final double scale;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var scene = useState<Scene?>(null);
 
     var earth = useState<Object?>(null);
@@ -48,7 +50,9 @@ class Planet extends HookWidget {
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
       child: Cube(
-        onObjectCreated: (object) {},
+        onObjectCreated: (object) {
+          print('object created: ${object.name}');
+        },
         onSceneCreated: (scn) {
           scene.value = scn;
           if (interative) {
@@ -56,13 +60,17 @@ class Planet extends HookWidget {
           } else {
             scene.value?.camera.position.z = 13;
           }
+          // get the cached planet asset
+          var cachedPlanets = ref.watch(cachedPlanetAssetsProvider);
+          var planetAsset = cachedPlanets[planet.name]!;
           earth.value = Object(
             name: planet.name,
+            modelfile: planetAsset,
             scale: Vector3(scale, scale, scale),
             backfaceCulling: false,
-            fileName: planet.assetLocation,
           );
           scene.value?.world.add(earth.value!);
+          print('scene created');
         },
         interactive: interative,
       ),

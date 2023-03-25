@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:planet_inspector/src/models/planet.dart';
+import 'package:planet_inspector/src/services/planet_caching.dart';
 
 // statenotifier provider for all the planets
 final planetsProvider = StateNotifierProvider<PlanetService, AllPlanets>(
-  (ref) => LocalPlanetService(),
+  (ref) => LocalPlanetService(ref.read(cachedPlanetAssetsProvider.notifier)),
 );
 
 @immutable
@@ -38,7 +39,9 @@ abstract class PlanetService extends StateNotifier<AllPlanets> {
 }
 
 class LocalPlanetService extends PlanetService {
-  LocalPlanetService() : super();
+  LocalPlanetService(this._planetAssetCachingService) : super();
+
+  final PlanetAssetCachingService _planetAssetCachingService;
 
   @override
   void selectPlanet(int index) {
@@ -130,5 +133,6 @@ class LocalPlanetService extends PlanetService {
         ),
       ],
     );
+    await _planetAssetCachingService.cachePlanetAssets(state.planets);
   }
 }
