@@ -17,13 +17,12 @@ class CachedAssetModelProvider extends ModelProvider {
 
   // add some caching to the asset loading
   String? _cachedObject;
-  Map<String, String> _cachedMaterials = {};
-  Map<String, Uint8List> _cachedTextures = {};
+  final Map<String, String> _cachedMaterials = {};
+  final Map<String, Uint8List> _cachedTextures = {};
 
   @override
   Future<Uint8List> loadAsset(String name) async {
     if (_cachedTextures.containsKey(name)) {
-      print('returning cached texture: $name');
       return _cachedTextures[name]!;
     }
     unawaited(
@@ -38,7 +37,6 @@ class CachedAssetModelProvider extends ModelProvider {
   @override
   Future<String> loadMaterial(String mtl) {
     if (_cachedMaterials.containsKey(mtl)) {
-      print('returning cached material: $mtl');
       return Future.value(_cachedMaterials[mtl]);
     }
     unawaited(
@@ -52,7 +50,6 @@ class CachedAssetModelProvider extends ModelProvider {
   @override
   Future<String> loadObject() {
     if (_cachedObject != null) {
-      print('returning cached object: $objectPath');
       return Future.value(_cachedObject);
     }
     unawaited(

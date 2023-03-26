@@ -50,9 +50,7 @@ class Planet extends HookConsumerWidget {
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
       child: Cube(
-        onObjectCreated: (object) {
-          print('object created: ${object.name}');
-        },
+        onObjectCreated: (object) {},
         onSceneCreated: (scn) {
           scene.value = scn;
           if (interative) {
@@ -70,7 +68,6 @@ class Planet extends HookConsumerWidget {
             backfaceCulling: false,
           );
           scene.value?.world.add(earth.value!);
-          print('scene created');
         },
         interactive: interative,
       ),

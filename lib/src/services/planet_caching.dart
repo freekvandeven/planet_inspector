@@ -1,4 +1,3 @@
-import 'package:flutter_cube/flutter_cube.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:planet_inspector/src/models/cached_model_provider.dart';
 import 'package:planet_inspector/src/models/planet.dart';
