@@ -63,7 +63,7 @@ class PlanetSliderWidget extends HookWidget {
           ),
           // the current planet is in the middle
           // use an animated builder to animate the planets orbiting
-          for (var i = -1; i < 2; i++) ...[
+          for (var i = -2; i < 3; i++) ...[
             AnimatedBuilder(
               animation: planetOrbitAnimationController,
               builder: (context, child) {
