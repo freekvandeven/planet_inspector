@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
@@ -16,6 +18,7 @@ class PlanetOverviewScreen extends HookConsumerWidget {
     var planets = ref.watch(planetsProvider).planets;
     var currentPlanet = useState(0);
     var targetPlanet = useState(0);
+    var planetsLoaded = useState(0);
     var startupAnimationController = useAnimationController(
       duration: const Duration(milliseconds: 3000),
       initialValue: 0.0,
@@ -31,6 +34,12 @@ class PlanetOverviewScreen extends HookConsumerWidget {
       CurvedAnimation(
         parent: startupAnimationController,
         curve: Curves.easeIn,
+      ),
+    );
+    var slidingAnimation = useAnimation(
+      CurvedAnimation(
+        parent: slidingAnimationController,
+        curve: Curves.easeInOut,
       ),
     );
 
@@ -55,6 +64,7 @@ class PlanetOverviewScreen extends HookConsumerWidget {
     );
     var size = MediaQuery.of(context).size;
     return Stack(
+      fit: StackFit.expand,
       alignment: Alignment.topCenter,
       children: [
         GestureDetector(
@@ -123,37 +133,6 @@ class PlanetOverviewScreen extends HookConsumerWidget {
             ),
           ),
         ),
-        // white helmet edge around the planet
-        Positioned(
-          top: size.height * 0.4,
-          child: GestureDetector(
-            onTap: () async {
-              ref
-                  .read(planetsProvider.notifier)
-                  .selectPlanet(currentPlanet.value);
-              await Navigator.of(context).pushNamed(
-                '/planet',
-              );
-            },
-            child: Container(
-              width: size.width * 0.5,
-              height: size.width * 0.5,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                // shadow to the bottom
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black,
-                    blurRadius: 10.0,
-                    spreadRadius: 1.0,
-                    offset: Offset(0.0, 5.0),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
         // black background for the planet
         Positioned(
           top: size.height * 0.4 + size.width * 0.05,
@@ -177,10 +156,20 @@ class PlanetOverviewScreen extends HookConsumerWidget {
           ),
         ),
         if (planets.isNotEmpty) ...[
-          for (var i = 0; i < 2; i++) ...[
+          for (var i = 0; i < planets.length; i++) ...[
             Positioned(
-              top: size.height * 0.4 + size.width * 0.23,
-              left: size.width * 0.35 + size.width * 0.3 * i,
+              top: getPositionOfPlanet(
+                index: i,
+                currentPlanet: currentPlanet.value + slidingAnimation,
+                totalPlanets: planets.length,
+                size: size,
+              ).dy,
+              left: getPositionOfPlanet(
+                index: i,
+                currentPlanet: currentPlanet.value + slidingAnimation,
+                totalPlanets: planets.length,
+                size: size,
+              ).dx,
               child: Opacity(
                 opacity: planetAppearingAnimation,
                 child: SizedBox(
@@ -190,10 +179,11 @@ class PlanetOverviewScreen extends HookConsumerWidget {
                     planet: planets[i],
                     onSceneLoaded: () {},
                     onPlanetLoaded: () async {
-                      Future.delayed(const Duration(seconds: 1), () {
+                      planetsLoaded.value++;
+                      if (planetsLoaded.value == planets.length) {
                         loading.value = false;
-                        startupAnimationController.forward(from: 0.0);
-                      });
+                        await startupAnimationController.forward(from: 0.0);
+                      }
                     },
                   ),
                 ),
@@ -201,6 +191,39 @@ class PlanetOverviewScreen extends HookConsumerWidget {
             ),
           ],
         ],
+        // make the bottom part of the screen white except the planet window
+        ColorFiltered(
+          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcOut),
+          child: Stack(
+            fit: StackFit.expand,
+            alignment: Alignment.topCenter,
+            children: [
+              Padding(
+                padding:
+                    EdgeInsets.only(top: size.height * 0.4 + size.width * 0.05),
+                child: Container(
+                  width: size.width,
+                  height: size.height * 0.6,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    backgroundBlendMode: BlendMode.dstOut,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: size.height * 0.4 + size.width * 0.05,
+                child: Container(
+                  width: size.width * 0.4,
+                  height: size.width * 0.4,
+                  decoration: const BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
         // add a ring of shadow around the planet
         // add shadow within the transparent circle
         Positioned(
@@ -217,6 +240,34 @@ class PlanetOverviewScreen extends HookConsumerWidget {
                   spreadRadius: 20.0,
                 ),
               ],
+            ),
+          ),
+        ),
+        // white helmet edge around the planet
+        Positioned(
+          top: size.height * 0.4,
+          child: GestureDetector(
+            onTap: () async {
+              ref
+                  .read(planetsProvider.notifier)
+                  .selectPlanet(currentPlanet.value);
+              await Navigator.of(context).pushNamed(
+                '/planet',
+              );
+            },
+            child: Container(
+              width: size.width * 0.5,
+              height: size.width * 0.5,
+              decoration: const BoxDecoration(
+                color: Colors.transparent,
+                shape: BoxShape.circle,
+                border: Border.fromBorderSide(
+                  BorderSide(
+                    color: Colors.white,
+                    width: 10.0,
+                  ),
+                ),
+              ),
             ),
           ),
         ),
@@ -252,5 +303,21 @@ class PlanetOverviewScreen extends HookConsumerWidget {
         ]
       ],
     );
+  }
+
+  Offset getPositionOfPlanet({
+    required int index,
+    required double currentPlanet,
+    required int totalPlanets,
+    required Size size,
+  }) {
+    var order = index - currentPlanet;
+    var topPoint = size.height * 0.4 + size.width * 0.23;
+    var height = size.height * 0.4;
+    // find a point on the circle based on the order
+    var angle = order * 2 * pi / totalPlanets - pi / 2;
+    var leftOffset = size.width * 0.35 + height * 0.5 * cos(angle);
+    var topOffset = topPoint + height * 0.5 + height * 0.5 * sin(angle);
+    return Offset(leftOffset, topOffset);
   }
 }
