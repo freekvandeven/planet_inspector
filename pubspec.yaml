@@ -41,3 +41,7 @@ flutter:
     - assets/planets/
     - assets/planets/earth/
     - assets/planets/mars/
+    - assets/planets/mercury/
+    - assets/planets/moon/
+    - assets/planets/venus/
+    - assets/planets/pluto/

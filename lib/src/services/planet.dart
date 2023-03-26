@@ -61,7 +61,6 @@ class LocalPlanetService extends PlanetService {
     await Future.delayed(const Duration(seconds: 1));
     state = const AllPlanets(
       planets: [
-        // earth
         PlanetModel(
           name: 'Earth',
           shortDescription: 'The third planet from the sun',
@@ -70,66 +69,45 @@ class LocalPlanetService extends PlanetService {
           history: 'The third planet from the sun',
           assetLocation: 'assets/planets/earth/earth.obj',
         ),
-
-        // moon
         PlanetModel(
           name: 'Moon',
           shortDescription: 'The moon is Earth\'s only natural satellite',
           fullDescription: 'The moon is Earth\'s only natural satellite',
           color: Colors.grey,
           history: 'The moon is Earth\'s only natural satellite',
-          assetLocation: 'assets/planets/mars/mars.obj',
+          assetLocation: 'assets/planets/moon/moon.obj',
         ),
-
-        // mars
         PlanetModel(
           name: 'Mars',
           shortDescription: 'The fourth planet from the sun',
           fullDescription: 'The fourth planet from the sun',
           color: Colors.deepOrange,
           history: 'The fourth planet from the sun',
-          assetLocation: 'assets/planets/earth/earth.obj',
+          assetLocation: 'assets/planets/mars/mars.obj',
         ),
-
-        // add 4 more planets
-        // mars
         PlanetModel(
           name: 'Venus',
           shortDescription: 'The fourth planet from the sun',
           fullDescription: 'The fourth planet from the sun',
           color: Colors.pink,
           history: 'The fourth planet from the sun',
-          assetLocation: 'assets/planets/mars/mars.obj',
+          assetLocation: 'assets/planets/venus/venus.obj',
         ),
-
-        // mars
         PlanetModel(
-          name: 'Venus2',
+          name: 'Mercury',
+          shortDescription: 'The fourth planet from the sun',
+          fullDescription: 'The fourth planet from the sun',
+          color: Colors.purple,
+          history: 'The fourth planet from the sun',
+          assetLocation: 'assets/planets/mercury/mercury.obj',
+        ),
+        PlanetModel(
+          name: 'Pluto',
           shortDescription: 'The fourth planet from the sun',
           fullDescription: 'The fourth planet from the sun',
           color: Colors.deepOrange,
           history: 'The fourth planet from the sun',
-          assetLocation: 'assets/planets/earth/earth.obj',
-        ),
-
-        // mars
-        PlanetModel(
-          name: 'Venus3',
-          shortDescription: 'The fourth planet from the sun',
-          fullDescription: 'The fourth planet from the sun',
-          color: Colors.deepOrange,
-          history: 'The fourth planet from the sun',
-          assetLocation: 'assets/planets/mars/mars.obj',
-        ),
-
-        // mars
-        PlanetModel(
-          name: 'Venus4',
-          shortDescription: 'The fourth planet from the sun',
-          fullDescription: 'The fourth planet from the sun',
-          color: Colors.deepOrange,
-          history: 'The fourth planet from the sun',
-          assetLocation: 'assets/planets/earth/earth.obj',
+          assetLocation: 'assets/planets/pluto/pluto.obj',
         ),
       ],
     );
