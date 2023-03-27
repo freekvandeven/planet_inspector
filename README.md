@@ -12,3 +12,8 @@ This is the project README.md
 Flutter planet inspector app
 
 Design based on: https://miro.medium.com/max/720/1*SX8KX4kZCywwbhGV9qpaiw.gif
+
+# Assets used in this project
+
+## The launcher icon
+<a href="https://www.flaticon.com/free-icons/solar-system" title="solar system icons">Solar system icons created by Freepik - Flaticon</a>

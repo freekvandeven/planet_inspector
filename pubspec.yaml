@@ -27,6 +27,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.12.0
   flutter_iconica_analysis:
     git:
       url: https://github.com/Iconica-Development/flutter_iconica_analysis
@@ -45,3 +46,8 @@ flutter:
     - assets/planets/moon/
     - assets/planets/venus/
     - assets/planets/pluto/
+
+flutter_icons:
+  android: "launcher_icon"
+  image_path: "assets/images/icon.png"
+  min_sdk_android: 21

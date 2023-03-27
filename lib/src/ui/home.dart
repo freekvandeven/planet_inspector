@@ -97,7 +97,6 @@ class PlanetOverviewScreen extends HookConsumerWidget {
             if (targetPlanet.value == currentPlanet.value) {
               if (details.delta.dx > 0) {
                 targetPlanet.value = (currentPlanet.value - 1) % planets.length;
-                // animation back
               } else {
                 targetPlanet.value = (currentPlanet.value + 1) % planets.length;
               }
@@ -394,9 +393,18 @@ class PlanetOverviewScreen extends HookConsumerWidget {
         topOffset - sceneTransitionAnimation * size.width * 0.15,
       );
     }
+    if (homescreen && index == 1 + currentPlanet.floor()) {
+      return Offset(
+        leftOffset - sceneTransitionAnimation * size.width * 0.15,
+        topOffset + sceneTransitionAnimation * size.width * 0.15,
+      );
+    }
     if (index == currentPlanet.floor()) {
       // show the planet in the center
       return Offset(-size.width * 0.2, size.height * 0.7);
+    }
+    if (index == 1 + currentPlanet.floor()) {
+      return Offset(size.width * 0.1, size.height * 0.3);
     }
     return Offset(leftOffset, topOffset);
   }
@@ -418,9 +426,18 @@ class PlanetOverviewScreen extends HookConsumerWidget {
         size.width * 0.3 + sceneTransitionAnimation * size.width * 0.3,
       );
     }
+    if (homescreen && index == 1 + currentPlanet.floor()) {
+      return Offset(
+        size.width * 0.3 + sceneTransitionAnimation * size.width * 0.3,
+        size.width * 0.3 + sceneTransitionAnimation * size.width * 0.3,
+      );
+    }
     if (index == currentPlanet.floor()) {
       // show the planet huge
       return Offset(size.width * 1.4, size.width * 1.4);
+    }
+    if (index == 1 + currentPlanet.floor()) {
+      return Offset(size.width * 0.8, size.width * 0.8);
     }
     return Offset(size.width * 0.3, size.width * 0.3);
   }
