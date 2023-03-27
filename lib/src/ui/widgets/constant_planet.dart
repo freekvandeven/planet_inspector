@@ -3,11 +3,13 @@ import 'package:flutter_cube/flutter_cube.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:planet_inspector/src/models/planet.dart';
+import 'package:planet_inspector/src/models/planet_controller.dart';
 import 'package:planet_inspector/src/services/planet_caching.dart';
 
 class ConstantPlanet extends HookConsumerWidget {
   const ConstantPlanet({
     required this.planet,
+    required this.controller,
     this.rotationDuration = const Duration(seconds: 50),
     this.onPlanetLoaded,
     this.onSceneLoaded,
@@ -18,19 +20,32 @@ class ConstantPlanet extends HookConsumerWidget {
   final PlanetModel planet;
   final Function()? onPlanetLoaded;
   final Function()? onSceneLoaded;
+  final PlanetController controller;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var scene = useState<Scene?>(null);
 
     var planetObject = useState<Object?>(null);
+    var horizontalAxis = useState(controller.horizontalRotating);
+    // listen to the controller to determine if we should move the x or y axis
+    useListenable(controller).addListener(() {
+      horizontalAxis.value = controller.horizontalRotating;
+      
+    });
 
-    var controller = useAnimationController(
+    var animationController = useAnimationController(
       duration: rotationDuration,
     );
-    useListenable(controller).addListener(() {
+    useListenable(animationController).addListener(() {
       if (planetObject.value != null) {
-        planetObject.value?.rotation.y = controller.value * -360;
+        if (horizontalAxis.value) {
+          planetObject.value?.rotation.y = animationController.value * -360;
+          planetObject.value?.rotation.x = 0;
+        } else {
+          planetObject.value?.rotation.x = animationController.value * -360;
+          planetObject.value?.rotation.y = 0;
+        }
         planetObject.value?.updateTransform();
         scene.value?.update();
       }
@@ -38,7 +53,7 @@ class ConstantPlanet extends HookConsumerWidget {
 
     useEffect(
       () {
-        controller.repeat();
+        animationController.repeat();
         return null;
       },
       const [],

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:planet_inspector/src/models/planet_controller.dart';
 import 'package:planet_inspector/src/services/planet.dart';
 import 'package:planet_inspector/src/ui/animated_vertical_text.dart';
 import 'package:planet_inspector/src/ui/planet_slider.dart';
@@ -20,6 +21,7 @@ class PlanetOverviewScreen extends HookConsumerWidget {
     var currentPlanet = useState(0);
     var targetPlanet = useState(0);
     var planetsLoaded = useState(0);
+    var planetController = useState(PlanetController());
     var startupAnimationController = useAnimationController(
       duration: const Duration(milliseconds: 3000),
       initialValue: 0.0,
@@ -72,6 +74,7 @@ class PlanetOverviewScreen extends HookConsumerWidget {
         if (sceneTransitionAnimationController.isCompleted) {
           sceneTransitionAnimationController.reset();
           homeScreen.value = !homeScreen.value;
+          planetController.value.changePlanetRotation();
         }
       },
     );
@@ -81,7 +84,7 @@ class PlanetOverviewScreen extends HookConsumerWidget {
         Future.delayed(Duration.zero, () async {
           await ref.read(planetsProvider.notifier).fetchPlanets();
         });
-        return null;
+        return () => planetController.dispose();
       },
       const [],
     );
@@ -227,6 +230,7 @@ class PlanetOverviewScreen extends HookConsumerWidget {
                     homescreen: homeScreen.value,
                   ).dy,
                   child: ConstantPlanet(
+                    controller: planetController.value,
                     planet: planets[i],
                     onSceneLoaded: () {},
                     onPlanetLoaded: () async {
