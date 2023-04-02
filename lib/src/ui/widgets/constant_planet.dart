@@ -31,7 +31,6 @@ class ConstantPlanet extends HookConsumerWidget {
     // listen to the controller to determine if we should move the x or y axis
     useListenable(controller).addListener(() {
       horizontalAxis.value = controller.horizontalRotating;
-      
     });
 
     var animationController = useAnimationController(
