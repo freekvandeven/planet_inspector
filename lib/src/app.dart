@@ -14,7 +14,7 @@ class PlanetInspectorApp extends StatelessWidget {
     return MaterialApp(
       theme: getTheme(),
       title: 'Planet Inspector',
-      initialRoute: '/home',
+      initialRoute: '',
       home: const SafeArea(child: Material(child: PlanetOverviewScreen())),
     );
   }

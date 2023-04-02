@@ -157,7 +157,8 @@ class PlanetSliderWidget extends HookWidget {
   }
 
   bool planetsMovingFoward() {
-    return (currentPlanet < targetPlanet) ||
-        (currentPlanet == planets.length - 1 && targetPlanet == 0);
+    return (!(targetPlanet == planets.length - 1 && currentPlanet == 0) &&
+            currentPlanet < targetPlanet) ||
+        (targetPlanet == 0 && currentPlanet == planets.length - 1);
   }
 }

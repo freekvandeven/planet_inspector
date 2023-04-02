@@ -7,7 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:planet_inspector/src/models/planet_controller.dart';
 import 'package:planet_inspector/src/services/planet.dart';
 import 'package:planet_inspector/src/ui/animated_vertical_text.dart';
-import 'package:planet_inspector/src/ui/widgets/constant_planet.dart';
+import 'package:planet_inspector/src/ui/widgets/planet.dart';
 import 'package:planet_inspector/src/ui/widgets/planet_slider.dart';
 
 class PlanetOverviewScreen extends HookConsumerWidget {
@@ -15,7 +15,7 @@ class PlanetOverviewScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var removeFacades = useState(true);
+    var removeFacades = useState(false);
     var loading = useState(true);
     var homeScreen = useState(true);
     var planets = ref.watch(planetsProvider).planets;
@@ -103,8 +103,6 @@ class PlanetOverviewScreen extends HookConsumerWidget {
       },
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
-        // on swipe left go to next planet
-        // on swipe right go to previous planet
         onHorizontalDragUpdate: (details) {
           if (targetPlanet.value == currentPlanet.value) {
             if (details.delta.dx > 0) {
@@ -267,9 +265,10 @@ class PlanetOverviewScreen extends HookConsumerWidget {
                         homescreen: homeScreen.value,
                         movingForward: movingForward.value,
                       ).dy,
-                      child: ConstantPlanet(
+                      child: Planet(
                         controller: planetController.value,
                         planet: planets[i],
+                        onSceneLoaded: () {},
                         onPlanetLoaded: () async {
                           planetsLoaded.value++;
                           if (planetsLoaded.value == planets.length * 2 &&
@@ -389,10 +388,20 @@ class PlanetOverviewScreen extends HookConsumerWidget {
                       currentPlanet: currentPlanet.value,
                       targetPlanet: targetPlanet.value,
                       onPlanetChanged: (selectedPlanet) {
-                        if (targetPlanet.value == currentPlanet.value) {
-                          // check if going forward or backward
+                        if (currentPlanet.value == targetPlanet.value) {
+                          // check if moving forward or backward
+                          if (selectedPlanet == 0 &&
+                              currentPlanet.value == planets.length - 1) {
+                            movingForward.value = true;
+                          } else if (selectedPlanet == planets.length - 1 &&
+                              currentPlanet.value == 0) {
+                            movingForward.value = false;
+                          } else {
+                            movingForward.value =
+                                selectedPlanet > currentPlanet.value;
+                          }
                           targetPlanet.value = selectedPlanet;
-                          slidingAnimationController.forward();
+                          slidingAnimationController.forward(from: 0.0);
                         }
                       },
                       opacity: planetAppearingAnimation,
@@ -446,7 +455,15 @@ class PlanetOverviewScreen extends HookConsumerWidget {
     required bool homescreen,
     required bool movingForward,
   }) {
-    var order = index - currentPlanet;
+    // order is - currentPlanet if moving forward and + currentPlanet if moving backward
+    var order = index - currentPlanet.toDouble();
+    // add the planet sliding animation
+    if (movingForward) {
+      order -= planetSlidingAnimation;
+    } else {
+      order += planetSlidingAnimation;
+    }
+
     var topPoint = size.height * 0.4 + size.width * 0.23;
     var height = size.height * 0.4;
     // find a point on the circle based on the order
@@ -456,25 +473,29 @@ class PlanetOverviewScreen extends HookConsumerWidget {
     if (homescreen && sceneTransitionAnimation == 0) {
       return Offset(leftOffset, topOffset);
     }
-    if (homescreen && index == currentPlanet.floor()) {
-      return Offset(
-        leftOffset - sceneTransitionAnimation * size.width * 0.15,
-        topOffset - sceneTransitionAnimation * size.width * 0.15,
-      );
+    if (homescreen) {
+      // animating the transition of the planets from the home screen to the planet screen
     }
-    if (homescreen && index == 1 + currentPlanet.floor()) {
-      return Offset(
-        leftOffset - sceneTransitionAnimation * size.width * 0.15,
-        topOffset + sceneTransitionAnimation * size.width * 0.15,
-      );
-    }
-    if (index == currentPlanet.floor()) {
-      // show the planet in the center
-      return Offset(-size.width * 0.2, size.height * 0.7);
-    }
-    if (index == 1 + currentPlanet.floor()) {
-      return Offset(size.width * 0.1, size.height * 0.3);
-    }
+
+    // if (homescreen && index == currentPlanet.floor()) {
+    //   return Offset(
+    //     leftOffset - sceneTransitionAnimation * size.width * 0.15,
+    //     topOffset - sceneTransitionAnimation * size.width * 0.15,
+    //   );
+    // }
+    // if (homescreen && index == 1 + currentPlanet.floor()) {
+    //   return Offset(
+    //     leftOffset - sceneTransitionAnimation * size.width * 0.15,
+    //     topOffset + sceneTransitionAnimation * size.width * 0.15,
+    //   );
+    // }
+    // if (index == currentPlanet.floor()) {
+    //   // show the planet in the center
+    //   return Offset(-size.width * 0.2, size.height * 0.7);
+    // }
+    // if (index == 1 + currentPlanet.floor()) {
+    //   return Offset(size.width * 0.1, size.height * 0.3);
+    // }
     return Offset(leftOffset, topOffset);
   }
 
