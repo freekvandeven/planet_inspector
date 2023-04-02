@@ -15,6 +15,7 @@ class PlanetOverviewScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var removeFacades = useState(false);
     var loading = useState(true);
     var homeScreen = useState(true);
     var planets = ref.watch(planetsProvider).planets;
@@ -89,287 +90,310 @@ class PlanetOverviewScreen extends HookConsumerWidget {
       const [],
     );
     var size = MediaQuery.of(context).size;
-    return Stack(
-      fit: StackFit.expand,
-      alignment: Alignment.topCenter,
-      children: [
-        GestureDetector(
-          // on swipe left go to next planet
-          // on swipe right go to previous planet
-          onHorizontalDragUpdate: (details) {
-            if (targetPlanet.value == currentPlanet.value) {
-              if (details.delta.dx > 0) {
-                targetPlanet.value = (currentPlanet.value - 1) % planets.length;
-              } else {
-                targetPlanet.value = (currentPlanet.value + 1) % planets.length;
+    return WillPopScope(
+      onWillPop: () async {
+        if (homeScreen.value) {
+          return true;
+        } else {
+          homeScreen.value = true;
+          planetController.value.changePlanetRotation();
+          return false;
+        }
+      },
+      child: Stack(
+        fit: StackFit.expand,
+        alignment: Alignment.topCenter,
+        children: [
+          GestureDetector(
+            // on swipe left go to next planet
+            // on swipe right go to previous planet
+            onHorizontalDragUpdate: (details) {
+              if (targetPlanet.value == currentPlanet.value) {
+                if (details.delta.dx > 0) {
+                  targetPlanet.value =
+                      (currentPlanet.value - 1) % planets.length;
+                } else {
+                  targetPlanet.value =
+                      (currentPlanet.value + 1) % planets.length;
+                }
+                slidingAnimationController.forward();
               }
-              slidingAnimationController.forward();
-            }
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: homeScreen.value ? Colors.white : Colors.black,
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search,
-                            color:
-                                homeScreen.value ? Colors.black : Colors.white,
-                            size: 30.0,
-                          ),
-                          Text(
-                            'XORE',
-                            style: TextStyle(
-                              fontSize: 30.0,
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: homeScreen.value ? Colors.white : Colors.black,
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                removeFacades.value = !removeFacades.value;
+                              },
+                              icon: Icon(
+                                Icons.search,
+                                color: homeScreen.value
+                                    ? Colors.black
+                                    : Colors.white,
+                                size: 30.0,
+                              ),
+                            ),
+                            Text(
+                              'XORE',
+                              style: TextStyle(
+                                fontSize: 30.0,
+                                color: homeScreen.value
+                                    ? Colors.black
+                                    : Colors.white,
+                              ),
+                            ),
+                            Icon(
+                              Icons.fullscreen_sharp,
                               color: homeScreen.value
                                   ? Colors.black
                                   : Colors.white,
+                              size: 30.0,
                             ),
-                          ),
-                          Icon(
-                            Icons.fullscreen_sharp,
-                            color:
-                                homeScreen.value ? Colors.black : Colors.white,
-                            size: 30.0,
+                          ],
+                        ),
+                        // vertical text of the planet
+                        SizedBox(
+                          height: size.height * 0.05,
+                        ),
+                        if (homeScreen.value) ...[
+                          AnimatedVerticalText(
+                            currentText: (planets.isNotEmpty)
+                                ? planets[currentPlanet.value].name
+                                : '',
+                            targetText: (planets.isNotEmpty)
+                                ? planets[targetPlanet.value].name
+                                : '',
+                            animationController: slidingAnimationController,
                           ),
                         ],
-                      ),
-                      // vertical text of the planet
-                      SizedBox(
-                        height: size.height * 0.05,
-                      ),
-                      if (homeScreen.value) ...[
-                        AnimatedVerticalText(
-                          currentText: (planets.isNotEmpty)
-                              ? planets[currentPlanet.value].name
-                              : '',
-                          targetText: (planets.isNotEmpty)
-                              ? planets[targetPlanet.value].name
-                              : '',
-                          animationController: slidingAnimationController,
-                        ),
                       ],
-                    ],
-                  ),
-                ),
-                const Spacer(),
-              ],
-            ),
-          ),
-        ),
-        // black background for the planet
-        Positioned(
-          top: size.height * 0.4 +
-              size.width * 0.05 -
-              sceneTransitionAnimation * size.width * 0.3,
-          child: GestureDetector(
-            onTap: () async {
-              await sceneTransitionAnimationController.forward();
-            },
-            child: Container(
-              width: size.width * 0.4 +
-                  sceneTransitionAnimation * size.width * 0.6,
-              height: size.width * 0.4 +
-                  sceneTransitionAnimation * size.width * 0.6,
-              decoration: const BoxDecoration(
-                color: Colors.black,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-        ),
-        if (planets.isNotEmpty) ...[
-          for (var i = 0; i < planets.length; i++) ...[
-            Positioned(
-              top: getPositionOfPlanet(
-                index: i,
-                currentPlanet: currentPlanet.value + slidingAnimation,
-                totalPlanets: planets.length,
-                size: size,
-                sceneTransitionAnimation: sceneTransitionAnimation,
-                homescreen: homeScreen.value,
-              ).dy,
-              left: getPositionOfPlanet(
-                index: i,
-                currentPlanet: currentPlanet.value + slidingAnimation,
-                totalPlanets: planets.length,
-                size: size,
-                sceneTransitionAnimation: sceneTransitionAnimation,
-                homescreen: homeScreen.value,
-              ).dx,
-              child: Opacity(
-                opacity: homeScreen.value && sceneTransitionAnimation == 0.0
-                    ? planetAppearingAnimation
-                    : i == currentPlanet.value || i == currentPlanet.value + 1
-                        ? 1.0
-                        : 0.0,
-                child: SizedBox(
-                  width: getPlanetSize(
-                    index: i,
-                    currentPlanet: currentPlanet.value + slidingAnimation,
-                    totalPlanets: planets.length,
-                    size: size,
-                    sceneTransitionAnimation: sceneTransitionAnimation,
-                    homescreen: homeScreen.value,
-                  ).dx,
-                  height: getPlanetSize(
-                    index: i,
-                    currentPlanet: currentPlanet.value + slidingAnimation,
-                    totalPlanets: planets.length,
-                    size: size,
-                    sceneTransitionAnimation: sceneTransitionAnimation,
-                    homescreen: homeScreen.value,
-                  ).dy,
-                  child: ConstantPlanet(
-                    controller: planetController.value,
-                    planet: planets[i],
-                    onSceneLoaded: () {},
-                    onPlanetLoaded: () async {
-                      planetsLoaded.value++;
-                      if (planetsLoaded.value == planets.length) {
-                        Future.delayed(const Duration(seconds: 1), () async {
-                          loading.value = false;
-
-                          loading.value = false;
-                          await startupAnimationController.forward(from: 0.0);
-                        });
-                      }
-                    },
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ],
-        if (homeScreen.value) ...[
-          // make the bottom part of the screen white except the planet window
-          ColorFiltered(
-            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcOut),
-            child: Stack(
-              fit: StackFit.expand,
-              alignment: Alignment.topCenter,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: size.height * 0.4 + size.width * 0.05,
-                  ),
-                  child: Container(
-                    width: size.width,
-                    height: size.height * 0.6,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      backgroundBlendMode: BlendMode.dstOut,
                     ),
                   ),
-                ),
-                Positioned(
-                  top: size.height * 0.4 +
-                      size.width * 0.05 -
-                      sceneTransitionAnimation * size.width * 0.3,
-                  child: Container(
-                    width: size.width * 0.4 +
-                        sceneTransitionAnimation * size.width * 0.6,
-                    height: size.width * 0.4 +
-                        sceneTransitionAnimation * size.width * 0.6,
-                    decoration: const BoxDecoration(
-                      color: Colors.black,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // add a ring of shadow around the planet
-          // add shadow within the transparent circle
-          Positioned(
-            top: size.height * 0.4 +
-                size.width * 0.05 -
-                sceneTransitionAnimation * size.width * 0.3,
-            child: Container(
-              width: size.width * 0.4 +
-                  sceneTransitionAnimation * size.width * 0.6,
-              height: size.width * 0.4 +
-                  sceneTransitionAnimation * size.width * 0.6,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    inset: true,
-                    blurRadius: 10.0,
-                    spreadRadius: 20.0,
-                  ),
+                  const Spacer(),
                 ],
               ),
             ),
           ),
-          // white helmet edge around the planet
+          // black background for the planet
           Positioned(
-            top: size.height * 0.4 -
-                sceneTransitionAnimation * size.width * 0.25,
+            top: size.height * 0.4 +
+                size.width * 0.05 -
+                sceneTransitionAnimation * size.width * 0.3,
             child: GestureDetector(
               onTap: () async {
                 await sceneTransitionAnimationController.forward();
               },
               child: Container(
-                width: size.width * 0.5 +
-                    sceneTransitionAnimation * size.width * 0.5,
-                height: size.width * 0.5 +
-                    sceneTransitionAnimation * size.width * 0.5,
+                width: size.width * 0.4 +
+                    sceneTransitionAnimation * size.width * 0.6,
+                height: size.width * 0.4 +
+                    sceneTransitionAnimation * size.width * 0.6,
                 decoration: const BoxDecoration(
-                  color: Colors.transparent,
+                  color: Colors.black,
                   shape: BoxShape.circle,
-                  border: Border.fromBorderSide(
-                    BorderSide(
-                      color: Colors.white,
-                      width: 10.0,
+                ),
+              ),
+            ),
+          ),
+          if (planets.isNotEmpty) ...[
+            for (var i = 0; i < planets.length; i++) ...[
+              Positioned(
+                top: getPositionOfPlanet(
+                  index: i,
+                  currentPlanet: currentPlanet.value + slidingAnimation,
+                  totalPlanets: planets.length,
+                  size: size,
+                  sceneTransitionAnimation: sceneTransitionAnimation,
+                  homescreen: homeScreen.value,
+                ).dy,
+                left: getPositionOfPlanet(
+                  index: i,
+                  currentPlanet: currentPlanet.value + slidingAnimation,
+                  totalPlanets: planets.length,
+                  size: size,
+                  sceneTransitionAnimation: sceneTransitionAnimation,
+                  homescreen: homeScreen.value,
+                ).dx,
+                child: Opacity(
+                  opacity: homeScreen.value && sceneTransitionAnimation == 0.0
+                      ? planetAppearingAnimation
+                      : i == currentPlanet.value || i == currentPlanet.value + 1
+                          ? 1.0
+                          : 0.0,
+                  child: SizedBox(
+                    width: getPlanetSize(
+                      index: i,
+                      currentPlanet: currentPlanet.value + slidingAnimation,
+                      totalPlanets: planets.length,
+                      size: size,
+                      sceneTransitionAnimation: sceneTransitionAnimation,
+                      homescreen: homeScreen.value,
+                    ).dx,
+                    height: getPlanetSize(
+                      index: i,
+                      currentPlanet: currentPlanet.value + slidingAnimation,
+                      totalPlanets: planets.length,
+                      size: size,
+                      sceneTransitionAnimation: sceneTransitionAnimation,
+                      homescreen: homeScreen.value,
+                    ).dy,
+                    child: ConstantPlanet(
+                      controller: planetController.value,
+                      planet: planets[i],
+                      onSceneLoaded: () {},
+                      onPlanetLoaded: () async {
+                        planetsLoaded.value++;
+                        if (planetsLoaded.value == planets.length) {
+                          Future.delayed(const Duration(seconds: 1), () async {
+                            loading.value = false;
+
+                            loading.value = false;
+                            await startupAnimationController.forward(from: 0.0);
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+          if (homeScreen.value) ...[
+            // make the bottom part of the screen white except the planet window
+            if (!removeFacades.value) ...[
+              ColorFiltered(
+                colorFilter:
+                    const ColorFilter.mode(Colors.white, BlendMode.srcOut),
+                child: Stack(
+                  fit: StackFit.expand,
+                  alignment: Alignment.topCenter,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                        top: size.height * 0.4 + size.width * 0.05,
+                      ),
+                      child: Container(
+                        width: size.width,
+                        height: size.height * 0.6,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          backgroundBlendMode: BlendMode.dstOut,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: size.height * 0.4 +
+                          size.width * 0.05 -
+                          sceneTransitionAnimation * size.width * 0.3,
+                      child: Container(
+                        width: size.width * 0.4 +
+                            sceneTransitionAnimation * size.width * 0.6,
+                        height: size.width * 0.4 +
+                            sceneTransitionAnimation * size.width * 0.6,
+                        decoration: const BoxDecoration(
+                          color: Colors.black,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            // add a ring of shadow around the planet
+            // add shadow within the transparent circle
+            Positioned(
+              top: size.height * 0.4 +
+                  size.width * 0.05 -
+                  sceneTransitionAnimation * size.width * 0.3,
+              child: Container(
+                width: size.width * 0.4 +
+                    sceneTransitionAnimation * size.width * 0.6,
+                height: size.width * 0.4 +
+                    sceneTransitionAnimation * size.width * 0.6,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      inset: true,
+                      blurRadius: 10.0,
+                      spreadRadius: 20.0,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // white helmet edge around the planet
+            Positioned(
+              top: size.height * 0.4 -
+                  sceneTransitionAnimation * size.width * 0.25,
+              child: GestureDetector(
+                onTap: () async {
+                  await sceneTransitionAnimationController.forward();
+                },
+                child: Container(
+                  width: size.width * 0.5 +
+                      sceneTransitionAnimation * size.width * 0.5,
+                  height: size.width * 0.5 +
+                      sceneTransitionAnimation * size.width * 0.5,
+                  decoration: const BoxDecoration(
+                    color: Colors.transparent,
+                    shape: BoxShape.circle,
+                    border: Border.fromBorderSide(
+                      BorderSide(
+                        color: Colors.white,
+                        width: 10.0,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
 
-          if (planets.isNotEmpty) ...[
-            Column(
-              children: [
-                const Spacer(),
-                PlanetSliderWidget(
-                  planetOrbitAnimationController: slidingAnimationController,
-                  planets: planets,
-                  currentPlanet: currentPlanet.value,
-                  targetPlanet: targetPlanet.value,
-                  onPlanetChanged: (selectedPlanet) {
-                    if (targetPlanet.value == currentPlanet.value) {
-                      // check if going forward or backward
-                      targetPlanet.value = selectedPlanet;
-                      slidingAnimationController.forward();
-                    }
-                  },
-                  opacity: planetAppearingAnimation,
-                  height: size.height * 0.3,
-                  width: size.width,
-                ),
-              ],
-            ),
+            if (planets.isNotEmpty) ...[
+              Column(
+                children: [
+                  const Spacer(),
+                  PlanetSliderWidget(
+                    planetOrbitAnimationController: slidingAnimationController,
+                    planets: planets,
+                    currentPlanet: currentPlanet.value,
+                    targetPlanet: targetPlanet.value,
+                    onPlanetChanged: (selectedPlanet) {
+                      if (targetPlanet.value == currentPlanet.value) {
+                        // check if going forward or backward
+                        targetPlanet.value = selectedPlanet;
+                        slidingAnimationController.forward();
+                      }
+                    },
+                    opacity: planetAppearingAnimation,
+                    height: size.height * 0.3,
+                    width: size.width,
+                  ),
+                ],
+              ),
+            ],
           ],
+          if (loading.value) ...[
+            Container(
+              color: Colors.white,
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+          ]
         ],
-        if (loading.value) ...[
-          Container(
-            color: Colors.white,
-            child: const Center(child: CircularProgressIndicator()),
-          ),
-        ]
-      ],
+      ),
     );
   }
 
