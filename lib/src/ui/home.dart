@@ -1,11 +1,12 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:planet_inspector/src/models/planet_controller.dart';
 import 'package:planet_inspector/src/services/planet.dart';
+import 'package:planet_inspector/src/services/planet_opacity.dart';
+import 'package:planet_inspector/src/services/planet_position.dart';
+import 'package:planet_inspector/src/services/planet_size.dart';
 import 'package:planet_inspector/src/ui/animated_vertical_text.dart';
 import 'package:planet_inspector/src/ui/widgets/planet.dart';
 import 'package:planet_inspector/src/ui/widgets/planet_slider.dart';
@@ -103,8 +104,21 @@ class PlanetOverviewScreen extends HookConsumerWidget {
       },
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
+        onVerticalDragUpdate: (details) {
+          // if swiping up
+          if (details.delta.dy > 0) {
+            if (homeScreen.value && sceneTransitionAnimation == 0.0) {
+              sceneTransitionAnimationController.forward();
+            }
+            if (!homeScreen.value && slidingAnimation == 0.0) {
+              targetPlanet.value = (currentPlanet.value + 1) % planets.length;
+              movingForward.value = true;
+              slidingAnimationController.forward();
+            }
+          }
+        },
         onHorizontalDragUpdate: (details) {
-          if (targetPlanet.value == currentPlanet.value) {
+          if (targetPlanet.value == currentPlanet.value && homeScreen.value) {
             if (details.delta.dx > 0) {
               targetPlanet.value = (currentPlanet.value - 1) % planets.length;
               movingForward.value = false;
@@ -189,16 +203,16 @@ class PlanetOverviewScreen extends HookConsumerWidget {
             Positioned(
               top: size.height * 0.4 +
                   size.width * 0.05 -
-                  sceneTransitionAnimation * size.width * 0.3,
+                  sceneTransitionAnimation * size.width * 0.8,
               child: GestureDetector(
                 onTap: () async {
                   await sceneTransitionAnimationController.forward();
                 },
                 child: Container(
                   width: size.width * 0.4 +
-                      sceneTransitionAnimation * size.width * 0.6,
+                      sceneTransitionAnimation * size.width * 1.6,
                   height: size.width * 0.4 +
-                      sceneTransitionAnimation * size.width * 0.6,
+                      sceneTransitionAnimation * size.width * 1.6,
                   decoration: const BoxDecoration(
                     color: Colors.black,
                     shape: BoxShape.circle,
@@ -207,7 +221,7 @@ class PlanetOverviewScreen extends HookConsumerWidget {
               ),
             ),
             if (planets.isNotEmpty) ...[
-              for (var i = 0; i < planets.length; i++) ...[
+              for (var i = planets.length - 1; i >= 0; i--) ...[
                 Positioned(
                   top: getPositionOfPlanet(
                     index: i,
@@ -312,12 +326,12 @@ class PlanetOverviewScreen extends HookConsumerWidget {
                       Positioned(
                         top: size.height * 0.4 +
                             size.width * 0.05 -
-                            sceneTransitionAnimation * size.width * 0.3,
+                            sceneTransitionAnimation * size.width * 0.8,
                         child: Container(
                           width: size.width * 0.4 +
-                              sceneTransitionAnimation * size.width * 0.6,
+                              sceneTransitionAnimation * size.width * 1.6,
                           height: size.width * 0.4 +
-                              sceneTransitionAnimation * size.width * 0.6,
+                              sceneTransitionAnimation * size.width * 1.6,
                           decoration: const BoxDecoration(
                             color: Colors.black,
                             shape: BoxShape.circle,
@@ -333,12 +347,12 @@ class PlanetOverviewScreen extends HookConsumerWidget {
               Positioned(
                 top: size.height * 0.4 +
                     size.width * 0.05 -
-                    sceneTransitionAnimation * size.width * 0.3,
+                    sceneTransitionAnimation * size.width * 0.8,
                 child: Container(
                   width: size.width * 0.4 +
-                      sceneTransitionAnimation * size.width * 0.6,
+                      sceneTransitionAnimation * size.width * 1.6,
                   height: size.width * 0.4 +
-                      sceneTransitionAnimation * size.width * 0.6,
+                      sceneTransitionAnimation * size.width * 1.6,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     boxShadow: [
@@ -354,16 +368,16 @@ class PlanetOverviewScreen extends HookConsumerWidget {
               // white helmet edge around the planet
               Positioned(
                 top: size.height * 0.4 -
-                    sceneTransitionAnimation * size.width * 0.25,
+                    sceneTransitionAnimation * size.width * 0.8,
                 child: GestureDetector(
                   onTap: () async {
                     await sceneTransitionAnimationController.forward();
                   },
                   child: Container(
                     width: size.width * 0.5 +
-                        sceneTransitionAnimation * size.width * 0.5,
+                        sceneTransitionAnimation * size.width * 1.6,
                     height: size.width * 0.5 +
-                        sceneTransitionAnimation * size.width * 0.5,
+                        sceneTransitionAnimation * size.width * 1.6,
                     decoration: const BoxDecoration(
                       color: Colors.transparent,
                       shape: BoxShape.circle,
@@ -422,116 +436,5 @@ class PlanetOverviewScreen extends HookConsumerWidget {
         ),
       ),
     );
-  }
-
-  double getPlanetOpacity({
-    required bool homeScreen,
-    required bool removeFacades,
-    required bool movingForward,
-    required int currentPlanet,
-    required int planetIndex,
-    required double planetAppearingAnimation,
-    required double sceneTransitionAnimation,
-    required double planetSlidingAnimation,
-  }) {
-    if (removeFacades) {
-      return 1.0;
-    }
-    return homeScreen && sceneTransitionAnimation == 0.0
-        ? planetAppearingAnimation
-        : planetIndex == currentPlanet || planetIndex == currentPlanet + 1
-            ? 1.0
-            : 0.0;
-  }
-
-  Offset getPositionOfPlanet({
-    required int index,
-    required int currentPlanet,
-    required int totalPlanets,
-    required Size size,
-    required double sceneTransitionAnimation,
-    required double planetAppearingAnimation,
-    required double planetSlidingAnimation,
-    required bool homescreen,
-    required bool movingForward,
-  }) {
-    // order is - currentPlanet if moving forward and + currentPlanet if moving backward
-    var order = index - currentPlanet.toDouble();
-    // add the planet sliding animation
-    if (movingForward) {
-      order -= planetSlidingAnimation;
-    } else {
-      order += planetSlidingAnimation;
-    }
-
-    var topPoint = size.height * 0.4 + size.width * 0.23;
-    var height = size.height * 0.4;
-    // find a point on the circle based on the order
-    var angle = order * 2 * pi / totalPlanets - pi / 2;
-    var leftOffset = size.width * 0.35 + height * 0.5 * cos(angle);
-    var topOffset = topPoint + height * 0.5 + height * 0.5 * sin(angle);
-    if (homescreen && sceneTransitionAnimation == 0) {
-      return Offset(leftOffset, topOffset);
-    }
-    if (homescreen) {
-      // animating the transition of the planets from the home screen to the planet screen
-    }
-
-    // if (homescreen && index == currentPlanet.floor()) {
-    //   return Offset(
-    //     leftOffset - sceneTransitionAnimation * size.width * 0.15,
-    //     topOffset - sceneTransitionAnimation * size.width * 0.15,
-    //   );
-    // }
-    // if (homescreen && index == 1 + currentPlanet.floor()) {
-    //   return Offset(
-    //     leftOffset - sceneTransitionAnimation * size.width * 0.15,
-    //     topOffset + sceneTransitionAnimation * size.width * 0.15,
-    //   );
-    // }
-    // if (index == currentPlanet.floor()) {
-    //   // show the planet in the center
-    //   return Offset(-size.width * 0.2, size.height * 0.7);
-    // }
-    // if (index == 1 + currentPlanet.floor()) {
-    //   return Offset(size.width * 0.1, size.height * 0.3);
-    // }
-    return Offset(leftOffset, topOffset);
-  }
-
-  Offset getPlanetSize({
-    required int index,
-    required int currentPlanet,
-    required int totalPlanets,
-    required Size size,
-    required double sceneTransitionAnimation,
-    required double planetAppearingAnimation,
-    required double planetSlidingAnimation,
-    required bool homescreen,
-    required bool movingForward,
-  }) {
-    if (homescreen && sceneTransitionAnimation == 0.0) {
-      return Offset(size.width * 0.3, size.width * 0.3);
-    }
-    if (homescreen && index == currentPlanet.floor()) {
-      return Offset(
-        size.width * 0.3 + sceneTransitionAnimation * size.width * 0.3,
-        size.width * 0.3 + sceneTransitionAnimation * size.width * 0.3,
-      );
-    }
-    if (homescreen && index == 1 + currentPlanet.floor()) {
-      return Offset(
-        size.width * 0.3 + sceneTransitionAnimation * size.width * 0.3,
-        size.width * 0.3 + sceneTransitionAnimation * size.width * 0.3,
-      );
-    }
-    if (index == currentPlanet.floor()) {
-      // show the planet huge
-      return Offset(size.width * 1.4, size.width * 1.4);
-    }
-    if (index == 1 + currentPlanet.floor()) {
-      return Offset(size.width * 0.8, size.width * 0.8);
-    }
-    return Offset(size.width * 0.3, size.width * 0.3);
   }
 }
