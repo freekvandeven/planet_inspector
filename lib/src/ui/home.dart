@@ -227,11 +227,13 @@ class PlanetOverviewScreen extends HookConsumerWidget {
                   homescreen: homeScreen.value,
                 ).dx,
                 child: Opacity(
-                  opacity: homeScreen.value && sceneTransitionAnimation == 0.0
-                      ? planetAppearingAnimation
-                      : i == currentPlanet.value || i == currentPlanet.value + 1
-                          ? 1.0
-                          : 0.0,
+                  opacity: getPlanetOpacity(
+                    homeScreen: homeScreen.value,
+                    planetAppearingAnimation: planetAppearingAnimation,
+                    currentPlanet: currentPlanet.value,
+                    planetIndex: i,
+                    sceneTransitionAnimation: sceneTransitionAnimation,
+                  ),
                   child: SizedBox(
                     width: getPlanetSize(
                       index: i,
@@ -395,6 +397,20 @@ class PlanetOverviewScreen extends HookConsumerWidget {
         ],
       ),
     );
+  }
+
+  double getPlanetOpacity({
+    required bool homeScreen,
+    required double planetAppearingAnimation,
+    required int currentPlanet,
+    required int planetIndex,
+    required double sceneTransitionAnimation,
+  }) {
+    return homeScreen && sceneTransitionAnimation == 0.0
+        ? planetAppearingAnimation
+        : planetIndex == currentPlanet || planetIndex == currentPlanet + 1
+            ? 1.0
+            : 0.0;
   }
 
   Offset getPositionOfPlanet({
